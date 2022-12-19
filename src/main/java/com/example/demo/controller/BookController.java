@@ -1,63 +1,49 @@
 package com.example.demo.controller;
-
-import com.example.demo.model.Book;
-import com.example.demo.repository.BookRepository;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import com.example.demo.dto.BookDto;
+import com.example.demo.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
-@RequestMapping("/books")
+@RequestMapping("/book")
 public class BookController {
-	
-	@Autowired
-	private BookRepository bookRepo;
-	
-	@GetMapping
-	public List<Book> findAllBooks() {
-		return bookRepo.findAll();
-	}
-	
-	@GetMapping("/{id}")
-	public Optional<Book> findBookById(@PathVariable(value = "id") long id){
-		return bookRepo.findById(id);
-	}
-	
-	@PostMapping
-	public void saveBook(@RequestBody Book book) {
-		bookRepo.save(book);
-			
-	}
-	
-	@PutMapping("/{id}")
-	public void updateBook(@RequestBody Book newBook, @PathVariable(value = "id") long id) {
-		Optional<Book> book = bookRepo.findById(id);
-		if(book.isPresent()) {
-			Book book1 = new Book();
-			book1.setBookId(id);
-			book1.setTitle(newBook.getTitle());
-			book1.setAuthor(newBook.getAuthor());
-			book1 = bookRepo.save(book1);
-		}
-	}
-	
-	@DeleteMapping("/{id}")
-	public void deleteBook(@PathVariable Long id) {
-		bookRepo.deleteById(id);
-	}
+
+    @Autowired
+    BookService bookService;
+
+    @PostMapping
+    public ResponseEntity<BookDto> postBook(@RequestBody BookDto bookDto) {
+        return ResponseEntity.ok(bookService.postBook(bookDto));
+    }
+
+  
+    @GetMapping("/{id}")
+    public ResponseEntity<BookDto> getBookById(@PathVariable Long id) {
+        return ResponseEntity.ok(bookService.getBookById(id));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<BookDto>> getAllBook() {
+        return ResponseEntity.ok(bookService.getAllBook());
+    }
+
+
+    @PutMapping("/{id}")
+    public ResponseEntity<BookDto> updateBookById(@PathVariable Long id, @RequestBody BookDto bookDto) {
+        return ResponseEntity.ok(bookService.updateBookById(id, bookDto));
+    }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteBookById(@PathVariable Long id) {
+
+            bookService.deleteBookById(id);
+            return ResponseEntity.ok().build();
+
+    }
+
 }
